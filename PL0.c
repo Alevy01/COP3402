@@ -57,14 +57,15 @@ int main(){
 		}
 	}
 
-
+	int pushVal = 0;
 	for(int i = 0; i<IC; i++){
 		switch(code_store[i].OP){
 			case 1: //LIT
 				LIT(stack, SP, *SP, code_store[i].M);
 				break;
 			case 2: //OPR 
-				OPR(stack, SP, *SP, BP, *BP, PC, *PC, code_store[i].M);
+				pushVal = OPR(stack, SP, *SP, BP, *BP, PC, *PC, code_store[i].M);
+				stack[SP] = pushVal;
 				break;
 			case 3: //LOD
 				break;
@@ -110,7 +111,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				*BP = stack[SP+3];
 				break;
 			case 1: //NEG
-				retVal = stack[SP];
+				retVal = stack[SP] * -1;
 				*pSP = SP - 1;
 				break;
 			case 2: //ADD
