@@ -17,6 +17,9 @@ typedef struct{
 	int M;
 } instructions;
 
+void LIT(int stack[], int SP, int *pSP, int M);
+int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M);
+
 
 int main(){
 	
@@ -29,8 +32,8 @@ int main(){
 	instructions code_store[MAX_CODE_LENGTH];
 	int IC = 0; //instruction counter 
 	int OP = 0; //operation code
-	int L = 0; //
-	int M = 0; //
+	int L = 0; //lexicographical level
+	int M = 0; //parameter
 
 	FILE * ifp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/mcode.txt", "r");
 	
@@ -56,10 +59,12 @@ int main(){
 
 
 	for(int i = 0; i<IC; i++){
-		switch(code_store[i]){
+		switch(code_store[i].OP){
 			case 1: //LIT
+				LIT(stack, SP, *SP, code_store[i].M);
 				break;
 			case 2: //OPR 
+				OPR(stack, SP, *SP, BP, *BP, PC, *PC, code_store[i].M);
 				break;
 			case 3: //LOD
 				break;
@@ -91,8 +96,110 @@ int main(){
 }
 
 
-void LIT(int stack[], int SP, int M){
-	SP = SP +1;
+void LIT(int stack[], int SP, int *pSP, int M){
+	*pSP = SP +1;
 	stack[SP] = M;
+}
+
+int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M){
+	int retVal = 0;
+	switch(M){
+			case 0: //Return from procedure call
+				*pSP = BP -1;
+				*pPC = stack[SP+4];
+				*BP = stack[SP+3];
+				break;
+			case 1: //NEG
+				retVal = stack[SP];
+				*pSP = SP - 1;
+				break;
+			case 2: //ADD
+				retVal = stack[SP] + stack[SP-1];
+				*pSP = SP - 2;
+				break;
+			case 3: //SUB
+				retVal = stack[SP] - stack[SP-1];
+				*pSP = SP - 2;
+				break;
+			case 4: //MUL
+				retVal = stack[SP] * stack[SP-1];
+				*pSP = SP - 2;
+				break;
+			case 5: //DIV
+				retVal = stack[SP]/stack[SP-1];
+				*pSP = SP - 2;
+				break;
+			case 6: //ODD
+				if(stack[SP] % 2 == 0){
+					retVal = 0;
+				}
+				else{
+					retVal = 1;
+				}
+				*pSP = SP -1;
+				break;
+			case 7: //MOD
+				retVal = stack[SP] % stack[SP-1];
+				*pSP = SP - 2;
+				break;
+			case 8: //EQL
+				if(stack[SP] == stack[SP-1]){
+					retVal = 1;
+				}
+				else{
+					retVal = 0;
+				}
+				*pSP = SP - 2;
+				break;
+			case 9: //NEQ
+				if(stack[SP] == stack[SP-1]){
+					retVal = 0;
+				}
+				else{
+					retVal = 1;
+				}
+				*pSP = SP - 2;
+				break;
+			case 10: //LSS
+				if(stack[SP] > stack[SP-1]){
+					retVal = 1;
+				}
+				else{
+					retVal = 0;
+				}
+				*pSP = SP - 2;
+				break;
+			case 11: //LEQ
+				if(stack[SP] >= stack[SP-1]){
+					retVal = 1;
+				}
+				else{
+					retVal = 0;
+				}
+				*pSP = SP - 2;
+				break;
+			case 12: //GTR
+				if(stack[SP] < stack[SP-1]){
+					retVal = 1;
+				}
+				else{
+					retVal = 0;
+				}
+				*pSP = SP - 2;
+				break;
+			case 13: //GEQ
+				if(stack[SP] <= stack[SP-1]){
+					retVal = 1;
+				}
+				else{
+					retVal = 0;
+				}
+				*pSP = SP - 2;
+				break;
+			default:
+				printf("Hit the default case, somethings wrong.\n");
+				break;
+		}
+	return retVal;
 }
 
