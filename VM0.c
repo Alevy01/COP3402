@@ -17,9 +17,17 @@ typedef struct{
 	int M;
 } instructions;
 
+char *opCodes[] = {"", "lit", "opr", "lod", "sto", "cal", "inc", "jmp", "jpc", "sio", "sio", "sio"};
+
 void LIT(int stack[], int SP, int *pSP, int M);
 int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M);
-
+void LOD(int stack[], int SP, int *pSP, int BP, int L, int M);
+void STO(int stack[], int SP, int *pSP, int BP, int L, int M);
+void CAL(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int L, int M);
+void INC(int SP, int *pSP, int M);
+void JMP(int *pPC, int M);
+int base(int l, int base, int stack[]);
+void PrintCodebase(instructions code_store[], int IC, FILE *ofp);
 
 int main(){
 	
@@ -36,7 +44,7 @@ int main(){
 	int M = 0; //parameter
 
 	FILE * ifp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/mcode.txt", "r");
-	
+
 	while (fscanf(ifp,"%d",&OP) != EOF){
 		//fscanf(ifp, "%d", &OP);
 		fscanf(ifp, "%d", &L);
@@ -46,8 +54,6 @@ int main(){
 		code_store[IC].OP = OP;
 		code_store[IC].L = L;
 		code_store[IC].M = M;
-
-		printf("%d %d %d\n", code_store[IC].OP, code_store[IC].L, code_store[IC].M);
 		IC = IC+1;
 
 		
@@ -57,17 +63,20 @@ int main(){
 		}
 	}
 
+	fclose(ifp);
+	FILE * ofp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/stacktrace.txt", "w");
+
+	PrintCodebase(code_store, IC, ofp);
 	int pushVal = 0;
 	for(int i = 0; i<IC; i++){
 		switch(code_store[i].OP){
 			case 1: //LIT
-				LIT(stack, SP, *SP, code_store[i].M);
 				break;
 			case 2: //OPR 
-				pushVal = OPR(stack, SP, *SP, BP, *BP, PC, *PC, code_store[i].M);
+				pushVal = OPR(stack, SP, &SP, BP, &BP, PC, &PC, code_store[i].M);
 				stack[SP] = pushVal;
 				break;
-			case 3: //LOD
+			case 3: //LODc
 				break;
 			case 4: //STO
 				break;
@@ -96,6 +105,13 @@ int main(){
 	return 0;
 }
 
+void PrintCodebase(instructions code_store[], int IC, FILE *ofp){
+	fprintf(ofp, "Line\t OP\t L\t M\t\n");
+	for(int i = 0; i<IC; i++){
+		fprintf(ofp, "%d\t %s\t %d\t %d\t\n", i, opCodes[code_store[i].OP], code_store[i].L, code_store[i].M);
+	}
+}
+
 
 void LIT(int stack[], int SP, int *pSP, int M){
 	*pSP = SP +1;
@@ -108,7 +124,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 			case 0: //Return from procedure call
 				*pSP = BP -1;
 				*pPC = stack[SP+4];
-				*BP = stack[SP+3];
+				*pBP = stack[SP+3];
 				break;
 			case 1: //NEG
 				retVal = stack[SP] * -1;
@@ -116,19 +132,19 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				break;
 			case 2: //ADD
 				retVal = stack[SP] + stack[SP-1];
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 3: //SUB
 				retVal = stack[SP] - stack[SP-1];
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 4: //MUL
 				retVal = stack[SP] * stack[SP-1];
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 5: //DIV
 				retVal = stack[SP]/stack[SP-1];
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 6: //ODD
 				if(stack[SP] % 2 == 0){
@@ -137,11 +153,10 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 1;
 				}
-				*pSP = SP -1;
 				break;
 			case 7: //MOD
 				retVal = stack[SP] % stack[SP-1];
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 8: //EQL
 				if(stack[SP] == stack[SP-1]){
@@ -150,7 +165,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 0;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 9: //NEQ
 				if(stack[SP] == stack[SP-1]){
@@ -159,7 +174,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 1;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 10: //LSS
 				if(stack[SP] > stack[SP-1]){
@@ -168,7 +183,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 0;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 11: //LEQ
 				if(stack[SP] >= stack[SP-1]){
@@ -177,7 +192,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 0;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 12: //GTR
 				if(stack[SP] < stack[SP-1]){
@@ -186,7 +201,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 0;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			case 13: //GEQ
 				if(stack[SP] <= stack[SP-1]){
@@ -195,7 +210,7 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 				else{
 					retVal = 0;
 				}
-				*pSP = SP - 2;
+				*pSP = SP - 1;
 				break;
 			default:
 				printf("Hit the default case, somethings wrong.\n");
@@ -204,3 +219,61 @@ int OPR(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int M
 	return retVal;
 }
 
+
+void LOD(int stack[], int SP, int *pSP, int BP, int L, int M){
+	*pSP = SP + 1;
+	int pushVal = stack[base(L, BP, stack) + M];
+	stack[SP+1] = pushVal; 
+}
+
+void STO(int stack[], int SP, int *pSP, int BP, int L, int M){
+	stack[base(L, BP, stack) + M] = stack[SP];
+	*pSP = SP - 1;
+}
+
+void CAL(int stack[], int SP, int *pSP, int BP, int *pBP, int PC, int *pPC, int L, int M){
+	stack[SP+1] = 0;
+	stack[SP+2] = base(L, BP, stack);
+	stack[SP+3] = BP;
+	stack[SP+4] = PC;
+	*pBP = SP + 1;
+	*pPC = M; 
+}
+
+void INC(int SP, int *pSP, int M){
+	*pSP = SP + M;
+}
+
+void JMP(int *pPC, int M){
+	*pPC = M;
+}
+
+void JPC(int stack[], int SP, int *pSP, int *pPC, int M){
+	if(stack[SP] == 0){
+		*pPC = M;
+	}
+	*pSP = SP - 1;
+}
+
+void SIO(int stack[], int SP, int *pSP, int M){
+	switch(M){
+		case 1: //SIO 1
+			break;
+		case 2: //SIO 2
+			break;
+		case 3: //SIO 3
+			break;
+		default:
+			printf("Default case in SIO. ERROR\n");
+			break;
+	}
+}
+
+int base(int l, int base, int stack[]){
+        int b1 = base; // find base L levels down
+        while (l > 0) {
+            b1 = stack[b1 + 1];
+            l--;
+        }
+        return b1;
+}
