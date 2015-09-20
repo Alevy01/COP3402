@@ -34,7 +34,7 @@ void printStacktrace(FILE *ofp);
 int main(){
 
 	readFile();
-	FILE * ofp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/stacktrace.txt", "w");
+	FILE * ofp = fopen("stacktrace.txt", "w");
 	PrintCodebase(ofp);
 	fprintf(ofp, "\t\t\t\tpc\t bp\t sp\t stack\t\n");
 	fprintf(ofp, "Initial values \t\t\t0\t 1\t 0\t\n");
@@ -90,7 +90,7 @@ void printStacktrace(FILE *ofp){
 
 void readFile(){
 	FILE *ifp;
-	ifp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/mcode.txt", "r");
+	ifp = fopen("mcode.txt", "r");
 
 	while(!feof(ifp)){
 		fscanf(ifp, "%d %d %d ", &code_store[IC].OP, &code_store[IC].L, &code_store[IC].M);
