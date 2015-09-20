@@ -90,7 +90,7 @@ void printStacktrace(FILE *ofp){
 
 void readFile(){
 	FILE *ifp;
-	ifp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/mcode-arithmetic.txt", "r");
+	ifp = fopen("/Users/AdamLevy/Documents/Senior_Year/COP3402/Project/mcode.txt", "r");
 
 	while(!feof(ifp)){
 		fscanf(ifp, "%d %d %d ", &code_store[IC].OP, &code_store[IC].L, &code_store[IC].M);
@@ -129,7 +129,7 @@ void allOperations(instructions IR, FILE *ofp){
 					break;
 				case 1: //NEG
 					stack[SP] = -stack[SP];
-					PC += 1;
+					//PC += 1;
 					break;
 				case 2: //ADD
 					SP-=1;
@@ -142,7 +142,7 @@ void allOperations(instructions IR, FILE *ofp){
 				case 4: //MULT
 					SP -= 1;
 					stack[SP] = stack[SP] * stack[SP + 1];
-					PC += 1;
+					//PC += 1;
 					break;
 				case 5: //DIV
 					SP -= 1;
@@ -168,7 +168,7 @@ void allOperations(instructions IR, FILE *ofp){
 					else{
 						stack[SP] = 0;
 					}
-					PC += 1;
+					//PC += 1;
 					break;
 				case 9:
 					SP -= 1;
@@ -178,7 +178,7 @@ void allOperations(instructions IR, FILE *ofp){
 					else{
 						stack[SP] = 0;
 					}
-					PC += 1;
+					//PC += 1;
 					break;
 				case 10:
 					SP -= 1;
@@ -188,7 +188,7 @@ void allOperations(instructions IR, FILE *ofp){
 					else{
 						stack[SP] = 0;
 					}
-					PC += 1;
+					//PC += 1;
 					break;
 				case 11:
 					SP -= 1;
@@ -198,31 +198,34 @@ void allOperations(instructions IR, FILE *ofp){
 					else{
 						stack[SP] = 0;
 					}
-					PC += 1;
+					//PC += 1;
 					break;
 				case 12:
+					SP -= 1;
+					//printf("%d %d\n", stack[SP], stack[SP+1]);
 					if(stack[SP] > stack[SP+1]){
 						stack[SP] = 1;
 					}
 					else{
 						stack[SP] = 0;
 					}
-					PC+= 1;
+					//PC+= 1;
 					break;
 				case 13:
+					SP -= 1;
 					if(stack[SP] >= stack[SP+1]){
 						stack[SP] = 1;
 					}
 					else{
 						stack[SP] = 0;
 					}
-					PC += 1;
+					//PC += 1;
 					break;
 				default:
 					break;
 			}
-			if(PC < IC-1) 
-				PC++;
+
+			PC+=1;
 			break;
 		case 3: //LOD
 			SP += 1;
@@ -264,11 +267,11 @@ void allOperations(instructions IR, FILE *ofp){
 			PC += 1;
 			break;
 		case 10: //SIO 2
+			scanf("%d", &stack[SP]);
 			SP += 1;
-			stack[SP] = IR.M;
 			PC += 1;
 			break;
-		case 11: //SIO 3 //need to print stacktrace with 0's
+		case 11: //SIO 3 
 			SP = 0;
 			PC = 0;
 			BP = 0;
