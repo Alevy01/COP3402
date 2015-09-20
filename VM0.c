@@ -126,6 +126,7 @@ void allOperations(instructions IR, FILE *ofp){
 					PC = stack[SP + 4];
 					BP = stack[SP + 3];
 					pipe_flags[SP + 1] = 0;
+					PC -= 1;
 					break;
 				case 1: //NEG
 					stack[SP] = -stack[SP];
