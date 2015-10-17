@@ -15,14 +15,10 @@ typedef enum {
 	void createTokenList();
 
 	FILE *lextable = fopen("lexemetable.txt", "a");
-	FILE *tokenlist = fopen("tokenlist.txt", "a");
 
 int main (void) {
-	//Opens input file
-	FILE *input = fopen("input.txt", "r");
-
 	//Create output files
-	createCleanInput(input);
+	createCleanInput();
 	createLexemetable();
 	createTokenList();
 
@@ -35,12 +31,16 @@ int main (void) {
 
 
 
-void createCleanInput(FILE *input) {
+void createCleanInput() {
+	//Open input file
+	FILE *input = fopen("input.txt", "r");
+
+	//Create output file
     FILE *clean = fopen("cleaninput.txt", "w");
     char c1, c2;
     
+    //Skips over comments for ouput
     while ((c1 = fgetc(input)) != EOF) {
-        printf("%c", c1);
         if (c1 == '/') {
             c2 = fgetc(input);
             while (c2 != '/') {
