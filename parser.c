@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,9 +49,6 @@ void createCleanInput(FILE *input) {
 
 void createTokenList(FILE *input){
   FILE *output = fopen("tokenlist.txt", "w");
-
-
-
 
 
 
