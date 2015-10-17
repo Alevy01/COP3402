@@ -11,36 +11,36 @@ typedef enum {
      readsym = 32, elsesym = 33;
 } token_type;
 
-	void createCleanInput(FILE *input);
+	void createCleanInput();
 	void createLexemetable();
 	void createTokenList();
+
 
 	FILE *lextable = fopen("lexemetable.txt", "w");
 	FILE *tokenlist = fopen("tokenlist.txt", "w");
 
 
-
 int main (void) {
-	//Opens input file
-	FILE *input = fopen("input.txt", "r");
-
 	//Create output files
-	createCleanInput(input);
+	createCleanInput();
 	createLexemetable();
 	createTokenList();
-
 
 	return 0;
 }
 
 
 
-void createCleanInput(FILE *input) {
+void createCleanInput() {
+	//Open input file
+	FILE *input = fopen("input.txt", "r");
+
+	//Create output file
     FILE *clean = fopen("cleaninput.txt", "w");
     char c1, c2;
     
+    //Skips over comments for ouput
     while ((c1 = fgetc(input)) != EOF) {
-        printf("%c", c1);
         if (c1 == '/') {
             c2 = fgetc(input);
             while (c2 != '/') {
@@ -51,6 +51,8 @@ void createCleanInput(FILE *input) {
         }
     }
     
+    //Close files
+    fclose(input);
     fclose(clean);
 }
 
@@ -80,16 +82,38 @@ void createLexemetable(){
 			
 		}
 
-		
-
+	
 	}
 
 }
 
+void createTokenList() {
+	//Open input file
+    FILE *input = fopen("lexemetable.txt", "r");
 
-void createTokenList(FILE *input){
-  FILE *output = fopen("tokenlist.txt", "w");
+    //Open output file
+    FILE *output = fopen("tokenlist.txt", "w");
+    char temp[11], temp2[11];
+    
+    //Skips over titles on page
+    fscanf(input, "%s", temp);
+    fscanf(input, "%s", temp);
+    fscanf(input, "%s", temp);
+    
+    //Scans through entire file
+    while (strcmp(temp2, "19")) {
+        fscanf(input, "%s", temp);
+        fscanf(input, "%s", temp2);
+        if (!strcmp(temp2, "2")) {
+            fprintf(output, "%s ", temp2);
+            fprintf(output, "%s ", temp);
+        }
+        else {
+            fprintf(output, "%s ", temp2);
+        }
+    }
 
-
+    //Close files
+    fclose(input);
+    fclose(output);
 }
-
