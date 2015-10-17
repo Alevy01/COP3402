@@ -81,12 +81,10 @@ void createLexemetable(){
 
 		
 		if(flag == 1){
-			printf("%s\n", string);
 			getTokenType(string, ofp);
 			getTokenType(overflow, ofp);
 		}
 		else{
-			printf("%s\n", string);
 			getTokenType(string, ofp);
 		}
 	}
@@ -193,7 +191,6 @@ void getTokenType(char string[], FILE *ofp){
 	else{
 		fprintf(ofp, "%s\t\t %d\n", string, identsym);
 	}
-
 }
 
 
