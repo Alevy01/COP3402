@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef enum {
      int nulsym = 1, identsym = 2, numbersym = 3, plussym = 4, minussym = 5,
