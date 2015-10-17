@@ -13,6 +13,7 @@ typedef enum {
 	void createCleanInput(FILE *input);
 	void createLexemetable();
 	void createTokenList();
+
 	FILE *lextable = fopen("lexemetable.txt", "a");
 	FILE *tokenlist = fopen("tokenlist.txt", "a");
 
@@ -24,6 +25,10 @@ int main (void) {
 	createCleanInput(input);
 	createLexemetable();
 	createTokenList();
+
+
+
+
 
 	return 0;
 }
@@ -48,3 +53,12 @@ void createCleanInput(FILE *input) {
     
     fclose(clean);
 }
+
+
+
+void createTokenList(FILE *input){
+  FILE *output = fopen("tokenlist.txt", "w");
+
+
+}
+
