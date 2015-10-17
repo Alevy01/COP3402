@@ -45,17 +45,40 @@ void createCleanInput() {
         }
     }
     
-    //Closes files
+    //Close files
     fclose(input);
     fclose(clean);
 }
 
+void createLexemetable(){
+	FILE * ifp = fopen("cleaninput.txt", "r");
+	
+	char string[11];
+	char c;
 
+	char syntax[6] = {'(', ')', ',', ';', '.', '='};
 
-void createTokenList(FILE *input){
-  FILE *output = fopen("tokenlist.txt", "w");
+	while(c != EOF){
+		c = fscanf(ifp, "%s", string);
+		if(c == EOF){
+			break;
+		}
+		char overflow;
+		int flag = 0;
+		for(int i = 0; i<sizeof(syntax); i++){
+			if(string[strlen(string)-1] == syntax[i]){
+				if(syntax[i] != '='){
+					overflow = string[strlen(string)-1];
+					flag = 1;
+					string[strlen(string)-1] = '\0';
+				}
+			}
+			
+		}
 
+		
 
+	}
 }
 
 void createTokenList() {
@@ -84,7 +107,7 @@ void createTokenList() {
         }
     }
 
-    //Closes files
+    //Close files
     fclose(input);
     fclose(output);
 }
