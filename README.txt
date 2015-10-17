@@ -13,3 +13,7 @@ To run the Scanner:
 	- Input is read from file input.txt
 	- Output will be in file cleaninput.txt lexemetable.txt tokenlist.txt
 	- Output example is based off of the input.txt included in the zip
+
+Adam Levy
+Sagar Mistry
+Zack Shackleton
