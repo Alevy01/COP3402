@@ -69,7 +69,7 @@ void createLexemetable(){
 		}
 		char overflow[1];
 		int flag = 0;
-		int i = 0;
+        int i;
 		for(i = 0; i<sizeof(syntax); i++){
 			if(string[strlen(string)-1] == syntax[i]){
 				if(syntax[i] != '='){
@@ -213,6 +213,10 @@ void createTokenList() {
         fscanf(input, "%s", temp);
         fscanf(input, "%s", temp2);
         if (!strcmp(temp2, "2")) {
+            fprintf(output, "%s ", temp2);
+            fprintf(output, "%s ", temp);
+        }
+        else if (!strcmp(temp2, "3")) {
             fprintf(output, "%s ", temp2);
             fprintf(output, "%s ", temp);
         }
