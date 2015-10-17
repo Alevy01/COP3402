@@ -69,7 +69,8 @@ void createLexemetable(){
 		}
 		char overflow[1];
 		int flag = 0;
-		for(int i = 0; i<sizeof(syntax); i++){
+		int i = 0;
+		for(i = 0; i<sizeof(syntax); i++){
 			if(string[strlen(string)-1] == syntax[i]){
 				if(syntax[i] != '='){
 					overflow[0] = string[strlen(string)-1];
