@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 typedef enum {
      int nulsym = 1, identsym = 2, numbersym = 3, plussym = 4, minussym = 5,
@@ -14,8 +15,10 @@ typedef enum {
 	void createLexemetable();
 	void createTokenList();
 
-	FILE *lextable = fopen("lexemetable.txt", "a");
-	FILE *tokenlist = fopen("tokenlist.txt", "a");
+	FILE *lextable = fopen("lexemetable.txt", "w");
+	FILE *tokenlist = fopen("tokenlist.txt", "w");
+
+
 
 int main (void) {
 	//Opens input file
@@ -25,9 +28,6 @@ int main (void) {
 	createCleanInput(input);
 	createLexemetable();
 	createTokenList();
-
-
-
 
 
 	return 0;
@@ -54,6 +54,37 @@ void createCleanInput(FILE *input) {
     fclose(clean);
 }
 
+void createLexemetable(){
+	FILE * ifp = fopen("cleaninput.txt", "r");
+	
+	char string[11];
+	char c;
+
+	char syntax[6] = {'(', ')', ',', ';', '.', '='};
+
+	while(c != EOF){
+		c = fscanf(ifp, "%s", string);
+		if(c == EOF){
+			break;
+		}
+		char overflow;
+		int flag = 0;
+		for(int i = 0; i<sizeof(syntax); i++){
+			if(string[strlen(string)-1] == syntax[i]){
+				if(syntax[i] != '='){
+					overflow = string[strlen(string)-1];
+					flag = 1;
+					string[strlen(string)-1] = '\0';
+				}
+			}
+			
+		}
+
+		
+
+	}
+
+}
 
 
 void createTokenList(FILE *input){

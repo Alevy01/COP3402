@@ -53,6 +53,8 @@ int main(){
 		
 	}
 
+	fclose(ofp);
+
 	return 0;
 }
 
