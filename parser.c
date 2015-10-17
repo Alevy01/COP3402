@@ -10,21 +10,15 @@ typedef enum {
      readsym = 32, elsesym = 33;
 } token_type;
 
-	void createCleanInput(FILE *input);
+	void createCleanInput();
 	void createLexemetable();
 	void createTokenList();
-
-	FILE *lextable = fopen("lexemetable.txt", "a");
 
 int main (void) {
 	//Create output files
 	createCleanInput();
 	createLexemetable();
 	createTokenList();
-
-
-
-
 
 	return 0;
 }
@@ -51,6 +45,8 @@ void createCleanInput() {
         }
     }
     
+    //Closes files
+    fclose(input);
     fclose(clean);
 }
 
@@ -62,3 +58,33 @@ void createTokenList(FILE *input){
 
 }
 
+void createTokenList() {
+	//Open input file
+    FILE *input = fopen("lexemetable.txt", "r");
+
+    //Open output file
+    FILE *output = fopen("tokenlist.txt", "w");
+    char temp[11], temp2[11];
+    
+    //Skips over titles on page
+    fscanf(input, "%s", temp);
+    fscanf(input, "%s", temp);
+    fscanf(input, "%s", temp);
+    
+    //Scans through entire file
+    while (strcmp(temp2, "19")) {
+        fscanf(input, "%s", temp);
+        fscanf(input, "%s", temp2);
+        if (!strcmp(temp2, "2")) {
+            fprintf(output, "%s ", temp2);
+            fprintf(output, "%s ", temp);
+        }
+        else {
+            fprintf(output, "%s ", temp2);
+        }
+    }
+
+    //Closes files
+    fclose(input);
+    fclose(output);
+}
