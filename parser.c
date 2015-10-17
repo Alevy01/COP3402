@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +13,7 @@ typedef enum {
 
 	createCleanInput(FILE *input);
 	createLexemetable();
-	createToeknList();
+	createTokenList();
 	FILE *lextable = fopen("lexemetable.txt", "a");
 	FILE *tokenlist = fopen("tokenlist.txt", "a");
 
@@ -23,7 +24,7 @@ int main (void) {
 	//Create output files
 	createCleanInput(input);
 	createLexemetable(input);
-	createToeknList(input);
+	createTokenList(input);
 
 
 
@@ -33,15 +34,27 @@ int main (void) {
 }
 
 void createCleanInput(FILE *input) {
-	
+
 	FILE *clean = fopen("cleaninput.txt", "a");
 	char c1, c2;
 
 	while (c1 = fgetc(input) != EOF) {
 		if (c1 == '/') {
 			while (c2 = fgetc(input) != EOF) {
-				
+
 			}
 		}
 	}
+}
+
+
+void createTokenList(FILE *input){
+  FILE *output = fopen("tokenlist.txt", "w");
+
+
+
+
+
+
+
 }
