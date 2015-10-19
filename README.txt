@@ -9,7 +9,7 @@ To run the VM:
 To run the Scanner:
 	- Navigate to folder which holds source code analyzer.c
 	- Compile using $gcc analyzer.c -o analyze
-	- Run compiled file using $./parser analyze
+	- Run compiled file using $./analyze
 	- Input is read from file input.txt
 	- Output will be in file cleaninput.txt lexemetable.txt tokenlist.txt
 	- Output example is based off of the input.txt included in the zip
