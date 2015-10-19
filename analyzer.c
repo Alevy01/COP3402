@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef enum {
      nulsym = 1, identsym, numbersym, plussym, minussym,
@@ -11,20 +11,16 @@ typedef enum {
      readsym, elsesym
 } token_type;
 
-	void createCleanInput();
-	void createLexemetable();
-	void createTokenList();
-	void getTokenType(char string[], FILE *ofp);
+void createLexemetable();
+void createCleanInput();
+void createTokenList();
 
 int main (void) {
-	//Create output files
 	createCleanInput();
 	createLexemetable();
 	createTokenList();
-
 	return 0;
 }
-
 
 void createCleanInput() {
 	//Open input file
@@ -38,9 +34,14 @@ void createCleanInput() {
     while ((c1 = fgetc(input)) != EOF) {
         if (c1 == '/') {
             c2 = fgetc(input);
-            while (c2 != '/') {
-                c2 = fgetc(input);
-            }
+            if (c2 == '*') {
+	            while (c2 != '/') {
+	                c2 = fgetc(input);
+	            }
+	        } else {
+	        	fputc(c1, clean);
+	        	fputc(c2, clean);
+	        }
         } else {
             fputc(c1, clean);
         }
@@ -51,149 +52,151 @@ void createCleanInput() {
     fclose(clean);
 }
 
-void createLexemetable(){
-	FILE * ifp = fopen("cleaninput.txt", "r");
-	FILE * ofp = fopen("lexemetable.txt", "w");
+void createLexemetable() {
+	FILE *input = fopen("cleaninput.txt", "r");
+	FILE *output = fopen("lexemetable.txt", "w");
+	char c1;
+	
+	fprintf(output, "lexeme\ttoken type\n");
 
-	char string[11];
-	char c;
+	while ((c1 = fgetc(input)) != EOF) {
+		// Checks to see if input is a number
+		if (isdigit(c1)) {
+			do {
+				fputc(c1, output);
+				c1 = fgetc(input);
+			} while (isdigit(c1));
 
-	char syntax[6] = {'(', ')', ',', ';', '.', '='};
-
-	fprintf(ofp, "lexeme\t\t token type\n");
-
-	while(c != EOF){
-		c = fscanf(ifp, "%s", string);
-		if(c == EOF){
-			break;
+			ungetc(c1, input);
+			fprintf(output, "\t%d\n", numbersym);
 		}
-		char overflow[1];
-		int flag = 0;
-        int i;
-		for(i = 0; i<sizeof(syntax); i++){
-			if(string[strlen(string)-1] == syntax[i]){
-				if(syntax[i] != '='){
-					overflow[0] = string[strlen(string)-1];
-					flag = 1;
-					string[strlen(string)-1] = '\0';
-				}
+
+		// Checks to see if input is in the alphabet
+		else if (isalpha(c1)) {
+			int i = 0;
+			char temp[11];
+			
+			int j = 0;
+			for (j = 0; j < 11; j++) {
+				temp[j] = '\0';
 			}
+
+			do {
+				temp[i++] = c1;
+				c1 = fgetc(input);
+			} while (isalpha(c1));
+
+			ungetc(c1, input);
+
+			if (!strcmp(temp, "odd")) {
+		    	fprintf(output, "odd\t%d\n", oddsym);
+		    }
+		    else if (!strcmp(temp, "begin")) {
+		    	fprintf(output, "begin\t%d\n", beginsym);
+		    }
+		    else if (!strcmp(temp, "end")) {
+		    	fprintf(output, "end\t%d\n", endsym);
+		    }
+		    else if (!strcmp(temp, "if")) {
+		    	fprintf(output, "if\t%d\n", ifsym);
+		    }
+		    else if (!strcmp(temp, "then")) {
+		    	fprintf(output, "then\t%d\n", thensym);
+		    }
+		    else if (!strcmp(temp, "while")) {
+		    	fprintf(output, "while\t%d\n", whilesym);
+		    }
+		    else if (!strcmp(temp, "do")) {
+		    	fprintf(output, "do\t%d\n", dosym);
+		    }
+		    else if (!strcmp(temp, "call")) {
+		    	fprintf(output, "call\t%d\n", callsym);
+		    }
+		    else if (!strcmp(temp, "const")) {
+		    	fprintf(output, "const\t%d\n", constsym);
+		    }
+		    else if (!strcmp(temp, "var")) {
+		    	fprintf(output, "var\t%d\n", varsym);
+		    }
+		    else if (!strcmp(temp, "procedure")) {
+		    	fprintf(output, "procedure\t%d\n", procsym);
+		    }
+		    else if (!strcmp(temp, "write")) {
+		    	fprintf(output, "write\t%d\n", writesym);
+		    }
+		    else if (!strcmp(temp, "read")) {
+		    	fprintf(output, "read\t%d\n", readsym);
+		    }
+		    else if (!strcmp(temp, "else")) {
+		    	fprintf(output, "else\t%d\n", elsesym);
+		    }
+		    else {
+				fprintf(output, "%s\t%d\n", temp, identsym);
+		    }
 		}
 
-		
-		if(flag == 1){
-			getTokenType(string, ofp);
-			getTokenType(overflow, ofp);
+		// Checks to see if input is a symbol
+		else if (c1 == '+') {
+		fprintf(output, "+\t%d\n", plussym);
 		}
-		else{
-			getTokenType(string, ofp);
+		else if (c1 == '-') {
+			fprintf(output, "-\t%d\n", minussym);
 		}
+	    else if (c1 == '*') {
+	    	fprintf(output, "*\t%d\n", multsym);
+	    }
+	    else if (c1 == '/') {
+	    	fprintf(output, "/\t%d\n", slashsym);
+	    }
+	    else if (c1 == '=') {
+    		fprintf(output, "=\t%d\n", eqsym);
+    	}
+    	else if (c1 == '<') {
+    		c1 = fgetc(input);
+    		if (c1 == '>') {
+    			fprintf(output, "<>\t%d\n", neqsym);
+    		}
+    		else if (c1 == '=') {
+    			fprintf(output, "<=\t%d\n", leqsym);
+    		}
+    		else {
+    			ungetc(c1, input);
+    			fprintf(output, "<\t%d\n", lessym);
+    		}
+    	}
+    	else if (c1 == '>') {
+    		c1 = fgetc(input);
+    		if (c1 == '=') {
+    			fprintf(output, ">=\t%d\n", geqsym);
+    		}
+    		else {
+    			ungetc(c1, input);
+    			fprintf(output, ">\t%d\n", gtrsym);  			
+    		}
+    	}
+    	else if (c1 == '(') {
+	    	fprintf(output, "(\t%d\n", lparentsym);
+	    }
+	    else if (c1 == ')') {
+	    	fprintf(output, ")\t%d\n", rparentsym);
+	    }
+	    else if (c1 == ',') {
+	    	fprintf(output, ",\t%d\n", commasym);
+	    }
+	    else if (c1 == ';') {
+	    	fprintf(output, ";\t%d\n", semicolonsym);
+	    }
+	    else if (c1 == '.') {
+	    	fprintf(output, ".\t%d\n", periodsym);
+	    }
+	    else if (c1 == ':') {
+	    	c1 = fgetc(input);
+    		fprintf(output, ":=\t%d\n", becomessym);
+	    }
 	}
-	fclose(ifp);
-	fclose(ofp);
+	fclose(input);
+	fclose(output);
 }
-
-
-void getTokenType(char string[], FILE *ofp){
-
-	if((int)string[0] >= 48 && (int)string[0] <= 57){
-		fprintf(ofp, "%s\t\t %d\n", string, numbersym);
-	}
-	else if(string[0] == '+'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], plussym);
-	}
-	else if(string[0] == '-'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], minussym);	
-	}
-	else if(string[0] == '*'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], multsym);
-	}
-	else if(string[0] == '/'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], slashsym);
-	}
-	else if(string[0] == '='){
-		fprintf(ofp, "%c\t\t %d\n", string[0], eqsym);
-	}
-	else if(string[0] == '<'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], lessym);
-	}
-	else if(string[0] == '>'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], gtrsym);
-	}
-	else if(string[0] == '('){
-		fprintf(ofp, "%c\t\t %d\n", string[0], lparentsym);
-	}
-	else if(string[0] == ')'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], rparentsym);
-	}
-	else if(string[0] == ','){
-		fprintf(ofp, "%c\t\t %d\n", string[0], commasym);
-	}
-	else if(string[0] == ';'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], semicolonsym);
-	}
-	else if(string[0] == '.'){
-		fprintf(ofp, "%c\t\t %d\n", string[0], periodsym);
-	}
-	else if(!strcmp(string, "odd")){
-		fprintf(ofp, "%s\t\t %d\n", string, oddsym);
-	}
-	else if(!strcmp(string, "<>")){
-		fprintf(ofp, "%s\t\t %d\n", string, neqsym);
-	}
-	else if(!strcmp(string, "<=")){
-		fprintf(ofp, "%s\t\t %d\n", string, leqsym);
-	}
-	else if(!strcmp(string, ">=")){
-		fprintf(ofp, "%s\t\t %d\n", string, geqsym);
-	}
-	else if(!strcmp(string, ":=")){
-		fprintf(ofp, "%s\t\t %d\n", string, becomessym);
-	}
-	else if(!strcmp(string, "begin")){
-		fprintf(ofp, "%s\t\t %d\n", string, beginsym);
-	}
-	else if(!strcmp(string, "end")){
-		fprintf(ofp, "%s\t\t %d\n", string, endsym);
-	}
-	else if(!strcmp(string, "if")){
-		fprintf(ofp, "%s\t\t %d\n", string, ifsym);
-	}
-	else if(!strcmp(string, "then")){
-		fprintf(ofp, "%s\t\t %d\n", string, thensym);
-	}
-	else if(!strcmp(string, "while")){
-		fprintf(ofp, "%s\t\t %d\n", string, whilesym);
-	}
-	else if(!strcmp(string, "do")){
-		fprintf(ofp, "%s\t\t %d\n", string, dosym);
-	}
-	else if(!strcmp(string, "call")){
-		fprintf(ofp, "%s\t\t %d\n", string, callsym);
-	}
-	else if(!strcmp(string, "const")){
-		fprintf(ofp, "%s\t\t %d\n", string, constsym);
-	}
-	else if(!strcmp(string, "var")){
-		fprintf(ofp, "%s\t\t %d\n", string, varsym);
-	}
-	else if(!strcmp(string, "procedure")){
-		fprintf(ofp, "%s\t\t %d\n", string, procsym);
-	}
-	else if(!strcmp(string, "write")){
-		fprintf(ofp, "%s\t\t %d\n", string, writesym);
-	}
-	else if(!strcmp(string, "read")){
-		fprintf(ofp, "%s\t\t %d\n", string, readsym);
-	}
-	else if(!strcmp(string, "else")){
-		fprintf(ofp, "%s\t\t %d\n", string, elsesym);
-	}
-	else{
-		fprintf(ofp, "%s\t\t %d\n", string, identsym);
-	}
-}
-
 
 void createTokenList() {
 	//Open input file
