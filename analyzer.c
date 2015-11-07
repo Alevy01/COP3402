@@ -11,13 +11,15 @@ typedef enum {
      readsym, elsesym
 } token_type;
 
-void createLexemetable();
 void createCleanInput();
+int createLexemetable();
 void createTokenList();
 
 int main (void) {
 	createCleanInput();
-	createLexemetable();
+	if (createLexemetable()) {
+		return 0;
+	}
 	createTokenList();
 	return 0;
 }
@@ -52,20 +54,32 @@ void createCleanInput() {
     fclose(clean);
 }
 
-void createLexemetable() {
+int createLexemetable() {
 	FILE *input = fopen("cleaninput.txt", "r");
 	FILE *output = fopen("lexemetable.txt", "w");
 	char c1;
-	
+	int line = 1;
 	fprintf(output, "lexeme\ttoken type\n");
 
 	while ((c1 = fgetc(input)) != EOF) {
 		// Checks to see if input is a number
+
 		if (isdigit(c1)) {
+			int counter = 1;
+
 			do {
 				fputc(c1, output);
 				c1 = fgetc(input);
+				counter++;
+				if (counter > 6) {
+					printf("ERROR Line %d: Digit too long\n", line);
+					return 1;
+				}
 			} while (isdigit(c1));
+
+			if (isalpha(c1)) {
+				printf("ERROR Line %d: Wrong Variable Name\n", line);
+			}
 
 			ungetc(c1, input);
 			fprintf(output, "\t%d\n", numbersym);
@@ -74,17 +88,23 @@ void createLexemetable() {
 		// Checks to see if input is in the alphabet
 		else if (isalpha(c1)) {
 			int i = 0;
-			char temp[11];
+			char temp[14];
+			int alphaCounter = 1;
 			
-			int j = 0;
-			for (j = 0; j < 11; j++) {
+			int j;
+			for (j = 0; j < 14; j++) {
 				temp[j] = '\0';
 			}
 
 			do {
 				temp[i++] = c1;
 				c1 = fgetc(input);
-			} while (isalpha(c1));
+				alphaCounter++;
+				if (alphaCounter > 12) {
+					printf("ERROR Line %d: Identifier too long\n", line);
+					return 1;
+				}
+			} while (isalpha(c1) || isdigit(c1));
 
 			ungetc(c1, input);
 
@@ -184,6 +204,7 @@ void createLexemetable() {
 	    	fprintf(output, ",\t%d\n", commasym);
 	    }
 	    else if (c1 == ';') {
+	    	line++;
 	    	fprintf(output, ";\t%d\n", semicolonsym);
 	    }
 	    else if (c1 == '.') {
@@ -193,9 +214,14 @@ void createLexemetable() {
 	    	c1 = fgetc(input);
     		fprintf(output, ":=\t%d\n", becomessym);
 	    }
+	    else if (c1 != ' ' && c1 != '\n' && c1 != '\t' && c1 != '\r'){
+	    	printf("ERROR Line %d: Invalid Symbol\n", line);
+	    	return 1;
+	    }
 	}
 	fclose(input);
 	fclose(output);
+	return 0;
 }
 
 void createTokenList() {
@@ -204,7 +230,7 @@ void createTokenList() {
 
     //Open output file
     FILE *output = fopen("tokenlist.txt", "w");
-    char temp[11], temp2[11];
+    char temp[14], temp2[14];
     
     //Skips over titles on page
     fscanf(input, "%s", temp);
