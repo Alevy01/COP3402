@@ -67,6 +67,7 @@ void getToken(FILE *ifp){
 
 }
 
+
 void error(int errNumber){
 
 	switch(int errNumber){
