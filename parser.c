@@ -12,7 +12,6 @@ typedef enum {
 } token_type;
 
 
-<<<<<<< HEAD
 #define MAX_STRING_LEN 11
 
 void getToken(FILE *ifp);
@@ -66,13 +65,4 @@ void getToken(FILE *ifp){
 
 
 }
-=======
 
-int main(){
-
-
-
-	return 0;
-}
-
->>>>>>> 05eafb1407a24cd86ff7f28b5e71314d1f260351
