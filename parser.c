@@ -207,6 +207,106 @@ void proc_dec(FILE *ifp){
 }
 
 void statement(FILE *ifp){
+	if(curr_token.type != identsym){
+		getToken(ifp); 
+		if(curr_token.type != becomessym){
+			error(); 
+		}
+		getToken(ifp); 
+		expression(ifp); 
+	}
+	else if(curr_token.type == callsym){
+		getToken(ifp);
+		if(curr_token.type != identsym){
+			error(); 
+		}
+		getToken(ifp); 
+	}
+	else if(curr_token.type == beginsym){
+		getToken(ifp);
+		statement(ifp);
+		do{
+			getToken(ifp); 
+			statement(ifp); 
+		}while(curr_token.type == semicolonsym);
+		if(curr_token.type != endsym)
+		{
+			error(); 
+		}
+		getToken(ifp); 
+	else if(curr_token.type == ifsym){
+		getToken(ifp); 
+		condition();
+		if(curr_token != thensym){
+			error(); 
+		}
+		getToken(ifp);
+		statement(ifp); 
+	}
+	else if(curr_token.type == whilesym){
+		getToken(ifp); 
+		condition(ifp); 
+		if(curr_token.type != dosym){
+			error(); 
+		}
+		getToken(ifp); 
+		statement(ifp); 
+	}
+	}
+}// end statement
+void condition(FILE *ifp){
+	if(curr_token.type == oddsym){
+		getToken(ifp); 
+		expression(ifp); 
+	}
+	else{
+		expression(ifp); 
+		if(curr_token.type != gtrsym || curr_token.type != lessym || curr_token.type != eqsym || curr_token.type != geqsym || curr_token.type != leqsym || curr_token.type != neqsym){
+			error(20); 
+		}
+		getToken(ifp);
+		expression(ifp);
+	}
+}// end condition
 
+void expression(ifp){
+	if(curr_token.type == plussym || curr_token.type == minussym){
+		getToken(ifp); 
+		term(ifp); 
+		do{
+			getToken(ifp);
+			term(ifp); 
+		}while(curr_token.type == plussym || curr_token.type == minussym)
+	}
+}// end expression
+
+void term(ifp){
+	factor(ifp); 
+	do{
+		getToken(ifp); 
+		factor(ifp); 
+	}while(curr_token.type == multsym || curr_token.type == slashsym);
+}// end term
+
+void factor(ifp){
+	if(curr_token.type == identsym){
+		getToken(ifp);
+	}
+	else if(curr_token.type == numbersym){
+		getToken(ifp); 
+	}
+	else if(curr_token.type == lparentsym){
+		getToken(ifp); 
+		expression(ifp);
+	}
+	else if(curr_token.type != rparentsym){
+		getToken(ifp); 
+	}
+	else{
+		error(23); 
+	}
+}// end Factor
+
+void emit(int op, int l, int m){
+	
 }
-
