@@ -13,6 +13,17 @@ typedef enum {
 
 
 #define MAX_STRING_LEN 11
+#define MAX_SYMBOL_TABLE_SIZE 100
+/* For constants, store kind, name and val   For variables, store kind, name, L and M   For procedures, store kind, name, L and M */
+typedef struct symbol {  
+	int kind;   // const = 1, var = 2, proc = 3 
+	char name[12]; // name up to 11 chars 
+	int val;   // value 
+	int level;  // L level 
+	int addr;   // M address
+} symbol; 
+
+
 
 void getToken(FILE *ifp);
 void error(int errNumber);
@@ -29,14 +40,13 @@ typedef struct{
 } token;
 
 
+symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
 token curr_token;
 int tokenNum = 0;
 
 int main(){
 	FILE *ifp = fopen("input.txt", "r");
-	while(1){
-	getToken(ifp);
-}
+	
 	return 0;
 }
 
