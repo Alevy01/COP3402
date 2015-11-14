@@ -57,24 +57,25 @@ int tokenNum = 0;
 int filePosition = 0;
 
 int main(){
-    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
+    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
     
     program(ifp);
-    
+    printSymbolTable();
     
     return 0;
 }
 
 void program(FILE *ifp){
     while(!feof(ifp)) {
-    getToken(ifp);
-    block(ifp);
-    if(curr_token.type != periodsym){
-        error(9);
-    }
-    else{
-        printf("no errors\n\n\n");
-    }}
+	    getToken(ifp);
+	    block(ifp);
+	    if(curr_token.type != periodsym){
+	        error(9);
+	    }
+	    else{
+	        printf("no errors\n\n\n");
+	    }
+	}
 }
 
 
@@ -208,7 +209,7 @@ void const_dec(FILE *ifp){
     if(curr_token.type != semicolonsym){
         error(5);
     }
-    printSymbolTable();
+
 }
 
 void var_dec(FILE *ifp){
@@ -230,7 +231,6 @@ void var_dec(FILE *ifp){
     }
     
     getToken(ifp);
-    printSymbolTable();
 }
 
 void proc_dec(FILE *ifp){
@@ -261,7 +261,6 @@ void proc_dec(FILE *ifp){
         getToken(ifp);
     }
     statement(ifp);
-    printSymbolTable();
 }
 
 void statement(FILE *ifp){
@@ -377,15 +376,22 @@ void factor(FILE *ifp){
 
 void printSymbolTable(){
     int i;
+	printf("Name \t Type \t Level \t Value\n");
     for(i = 0; i < tokenNum; i++){
+    	char type[6] = "";
         if(symbol_table[i].kind == 1){
-            printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "const", symbol_table[i].val);
+        	strcpy(type, "const");
+            //printf("%s \t %s \t %d\n", symbol_table[i].name, "const", symbol_table[i].val);
         }
         else if(symbol_table[i].kind == 2){
-              printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "var", symbol_table[i].val);
+			strcpy(type, "var");
+			//printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "var", symbol_table[i].val);
         }
         else if(symbol_table[i].kind == 3){
-              printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "proc", symbol_table[i].val);
+            strcpy(type, "proc");
+        	//printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "proc", symbol_table[i].val);
         }
+        //THE 0 IS A PLACE HOLDER FOR THE LEVEL, WE STILL NEED TO RETRIEVE THE CORRECT LEVEL
+        printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, 0, symbol_table[i].val);
     }
 }
