@@ -196,7 +196,7 @@ void const_dec(FILE *ifp){
             error(3);
         }
         getToken(ifp);
-        if(curr_token.type == numbersym)
+        if(curr_token.type != numbersym)
         {
             error(2);
         }
@@ -231,6 +231,7 @@ void var_dec(FILE *ifp){
     }
     
     getToken(ifp);
+
 }
 
 void proc_dec(FILE *ifp){
@@ -261,6 +262,7 @@ void proc_dec(FILE *ifp){
         getToken(ifp);
     }
     statement(ifp);
+
 }
 
 void statement(FILE *ifp){
