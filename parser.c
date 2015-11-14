@@ -209,6 +209,7 @@ void const_dec(FILE *ifp){
         error(5);
     }
     printSymbolTable();
+    printf("Const_Dec complete \n");
 }
 
 void var_dec(FILE *ifp){
@@ -231,6 +232,7 @@ void var_dec(FILE *ifp){
     
     getToken(ifp);
     printSymbolTable();
+    printf("var_dec complete \n");
 }
 
 void proc_dec(FILE *ifp){
@@ -262,6 +264,7 @@ void proc_dec(FILE *ifp){
     }
     statement(ifp);
     printSymbolTable();
+    printf("proc_dec \n");
 }
 
 void statement(FILE *ifp){
