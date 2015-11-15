@@ -24,14 +24,12 @@ typedef struct symbol {
 } symbol;
 
 
-
+int LexLevel = 0;
+int m = 3;
 void getToken(FILE *ifp);
 void program(FILE *ifp);
 void error(int errNumber);
 void block (FILE *ifp);
-void const_dec(FILE *ifp);
-void var_dec(FILE *ifp);
-void proc_dec(FILE *ifp);
 void statement(FILE *ifp);
 void condition(FILE *ifp);
 void expression(FILE *ifp);
@@ -57,25 +55,29 @@ int tokenNum = 0;
 int filePosition = 0;
 
 int main(){
-    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
+    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
     
     program(ifp);
-    printSymbolTable();
+    
+    
     
     return 0;
 }
 
 void program(FILE *ifp){
-    while(!feof(ifp)) {
-	    getToken(ifp);
-	    block(ifp);
-	    if(curr_token.type != periodsym){
-	        error(9);
-	    }
-	    else{
-	        printf("no errors\n\n\n");
-	    }
-	}
+    while(!feof(ifp)){
+        getToken(ifp);
+        block(ifp);
+    }
+    printSymbolTable();
+    
+    if(curr_token.type != periodsym){
+        error(9);
+    }
+    else{
+        printf("no errors\n\n\n");
+    }
+    
 }
 
 
@@ -108,188 +110,178 @@ void getToken(FILE *ifp){
 
 void error(int errNumber){
     
-     switch(errNumber){
-     case 1:
-     printf("Use = instead of :=\n");
-     break;
-     case 2:
-     printf("= must be followed by a number\n");
-     break;
-     case 3:
-     printf("Identifier must be folowed by :=\n");
-      break;
-     case 4:
-     printf("Const,Var,Procedure, must be followed by identifier\n");
-      break;
-     case 5:
-     printf("Semicolon or comma missing.\n");
-      break;
-     case 6:
-     printf("Incorrect symbol after procedure declaration.\n");
-      break;
-     case 7:
-     printf("Statement Expected.\n");
-      break;
-     case 8:
-     printf("Incorrect symbol after statement part in block.\n");
-      break;
-     case 9:
-     printf("Period expected.\n");
-      break;
-     case 10:
-     printf("Semicolon between statements missing.\n");
-      break;
-     case 11:
-     printf("Undeclared Identifier\n");
-      break;
-     case 12:
-     printf("Assignment to constatn or procedure is not allowed.\n");
-      break;
-     case 13:
-     printf("Assignment operator expected\n");
-      break;
-     case 14:
-     printf("Call must be followed by an identifier.\n");
-      break;
-     case 15:
-     printf("Call of a constant or variable is meaningless.\n");
-      break;
-     case 16:
-     printf("then expcted.\n");
-      break;
-     case 17:
-     printf("Semicolon or } expected.\n");
-      break;
-     case 18:
-     printf("do expected.\n");
-      break;
-     case 19:
-     printf("Incorrect symbol following statement.\n");
-      break;
-     case 20:
-     printf("Relational operator expected.\n");
-      break;
-     case 21:
-     printf("Expression must not contain a procedure identifier.\n");
-      break;
-     case 22:
-     printf("Right Parenthesis is missing.\n");
-      break;
-     case 23:
-     printf("The preceding factor cannot begin with this symbol.\n");
-      break;
-     case 24:
-     printf("An expression canot begin with this symbol.\n");
-      break;
-     case 25:
-     printf("This number is too large.\n");
-      break;
-     default:
-     printf("Error. Not a valid code Error value.\n");
-      break;
-     }
-     printf("done\n");
+    switch(errNumber){
+        case 1:
+            printf("Use = instead of :=\n");
+            break;
+        case 2:
+            printf("= must be followed by a number\n");
+            break;
+        case 3:
+            printf("Identifier must be folowed by :=\n");
+            break;
+        case 4:
+            printf("Const,Var,Procedure, must be followed by identifier\n");
+            break;
+        case 5:
+            printf("Semicolon or comma missing.\n");
+            break;
+        case 6:
+            printf("Incorrect symbol after procedure declaration.\n");
+            break;
+        case 7:
+            printf("Statement Expected.\n");
+            break;
+        case 8:
+            printf("Incorrect symbol after statement part in block.\n");
+            break;
+        case 9:
+            printf("Period expected.\n");
+            break;
+        case 10:
+            printf("Semicolon between statements missing.\n");
+            break;
+        case 11:
+            printf("Undeclared Identifier\n");
+            break;
+        case 12:
+            printf("Assignment to constatn or procedure is not allowed.\n");
+            break;
+        case 13:
+            printf("Assignment operator expected\n");
+            break;
+        case 14:
+            printf("Call must be followed by an identifier.\n");
+            break;
+        case 15:
+            printf("Call of a constant or variable is meaningless.\n");
+            break;
+        case 16:
+            printf("then expcted.\n");
+            break;
+        case 17:
+            printf("Semicolon or } expected.\n");
+            break;
+        case 18:
+            printf("do expected.\n");
+            break;
+        case 19:
+            printf("Incorrect symbol following statement.\n");
+            break;
+        case 20:
+            printf("Relational operator expected.\n");
+            break;
+        case 21:
+            printf("Expression must not contain a procedure identifier.\n");
+            break;
+        case 22:
+            printf("Right Parenthesis is missing.\n");
+            break;
+        case 23:
+            printf("The preceding factor cannot begin with this symbol.\n");
+            break;
+        case 24:
+            printf("An expression canot begin with this symbol.\n");
+            break;
+        case 25:
+            printf("This number is too large.\n");
+            break;
+        default:
+            printf("Error. Not a valid code Error value.\n");
+            break;
+    }
+    
 }
 
 void block(FILE *ifp){
     
     if(curr_token.type == constsym)
     {
-        const_dec(ifp);
+        do{
+            getToken(ifp);
+            symbol_table[tokenNum].kind = 1;
+            if(curr_token.type != identsym){
+                error(4);
+            }
+            strcpy(symbol_table[tokenNum].name,curr_token.string);
+            getToken(ifp);
+            if(curr_token.type != eqsym){
+                error(3);            }
+            getToken(ifp);
+            if(curr_token.type != numbersym)
+            {
+                error(2);
+            }
+            symbol_table[tokenNum].val = curr_token.numeric;
+            getToken(ifp);
+            tokenNum++;
+            
+        }while(curr_token.type == commasym);
+        
+        if(curr_token.type != semicolonsym){
+            error(5);
+        }
+        m = 3;
     }
-    else if(curr_token.type == varsym)
-    {
-        var_dec(ifp);
+    
+    else if(curr_token.type == varsym){
+        do{
+            symbol_table[tokenNum].kind = 2;
+            getToken(ifp);
+            if(curr_token.type != identsym){
+                error(4);}
+            strcpy(symbol_table[tokenNum].name,curr_token.string);
+            symbol_table[tokenNum].level = LexLevel;
+            symbol_table[tokenNum].addr = m;
+            m++;
+            tokenNum++;
+            getToken(ifp);
+        }while(curr_token.type == commasym);
+        
+        if(curr_token.type != semicolonsym){
+            error(5);
+        }
+        
+        
+        
     }
     else if(curr_token.type == procsym){
-        proc_dec(ifp);
+        while(curr_token.type == procsym){
+            symbol_table[tokenNum].kind = 3;
+            getToken(ifp);
+            if(curr_token.type != identsym){
+                error(6);
+            }
+            strcpy(symbol_table[tokenNum].name, curr_token.string);
+            tokenNum++;
+            getToken(ifp);
+            if(curr_token.type != semicolonsym){
+                error(5);
+            }
+            getToken(ifp);
+            block(ifp);
+            
+            if(curr_token.type != semicolonsym){
+                error(5);
+            }
+            getToken(ifp);
+            block(ifp);
+            
+            if(curr_token.type != semicolonsym)
+            {
+                error(5);
+            }
+            getToken(ifp);
+        }
+        statement(ifp);
+        
     }
     else {
         statement(ifp);
     }
 }
 
-void const_dec(FILE *ifp){
-    do{
-        getToken(ifp);
-        symbol_table[tokenNum].kind = 1;
-        if(curr_token.type != identsym){
-            error(4);
-        }
-        strcpy(symbol_table[tokenNum].name,curr_token.string);
-        getToken(ifp);
-        if(curr_token.type != eqsym){
-            error(3);
-        }
-        getToken(ifp);
-        if(curr_token.type != numbersym)
-        {
-            error(2);
-        }
-        symbol_table[tokenNum].val = curr_token.numeric;
-        getToken(ifp);
-        tokenNum++;
-        
-    }while(curr_token.type == commasym);
-    
-    if(curr_token.type != semicolonsym){
-        error(5);
-    }
 
-}
-
-void var_dec(FILE *ifp){
-    do{
-        symbol_table[tokenNum].kind = 2;
-        getToken(ifp);
-        if(curr_token.type != identsym){
-            error(4);}
-        strcpy(symbol_table[tokenNum].name,curr_token.string);
-        symbol_table[tokenNum].level = 0;
-        //symbol_table[tokenNum].addr = m;
-        //m++;
-        tokenNum++;
-        getToken(ifp);
-    }while(curr_token.type == commasym);
-    
-    if(curr_token.type != semicolonsym){
-        error(2);
-    }
-    
-    getToken(ifp);
-
-}
-
-void proc_dec(FILE *ifp){
-    while(curr_token.type == procsym){
-        symbol_table[tokenNum].kind = 3;
-        getToken(ifp);
-        if(curr_token.type != identsym){
-            error(6);
-        }
-        strcpy(symbol_table[tokenNum].name, curr_token.string);
-        tokenNum++;
-        if(curr_token.type != semicolonsym){
-            error(5);
-        }
-        getToken(ifp);
-        block(ifp);
-        
-        if(curr_token.type != semicolonsym){
-            error(5);
-        }
-        getToken(ifp);
-        block(ifp);
-        
-        if(curr_token.type != semicolonsym)
-        {
-            error(5);
-        }
-        getToken(ifp);
-    }
-    statement(ifp);
-
-}
 
 void statement(FILE *ifp){
     if(curr_token.type == identsym){
@@ -346,7 +338,7 @@ void condition(FILE *ifp){
     }
     else{
         expression(ifp);
-        if(curr_token.type != gtrsym || curr_token.type != lessym || curr_token.type != eqsym || curr_token.type != geqsym || curr_token.type != leqsym || curr_token.type != neqsym){
+        if(curr_token.type != gtrsym && curr_token.type != lessym && curr_token.type != eqsym && curr_token.type != geqsym && curr_token.type != leqsym && curr_token.type != neqsym){
             error(20);
         }
         getToken(ifp);
@@ -357,20 +349,22 @@ void condition(FILE *ifp){
 void expression(FILE *ifp){
     if(curr_token.type == plussym || curr_token.type == minussym){
         getToken(ifp);
-        term(ifp);
-        do{
-            getToken(ifp);
-            term(ifp);
-        }while(curr_token.type == plussym || curr_token.type == minussym);
     }
+    
+    term(ifp);
+    while(curr_token.type == plussym || curr_token.type == minussym){
+        getToken(ifp);
+        term(ifp);
+    }
+    
 }// end expression
 
 void term(FILE *ifp){
-    factor(ifp); 
-    do{
-        getToken(ifp); 
-        factor(ifp); 
-    }while(curr_token.type == multsym || curr_token.type == slashsym);
+    factor(ifp);
+    while(curr_token.type == multsym || curr_token.type == slashsym){
+        getToken(ifp);
+        factor(ifp);
+    }
 }// end term
 
 void factor(FILE *ifp){
@@ -378,23 +372,23 @@ void factor(FILE *ifp){
         getToken(ifp);
     }
     else if(curr_token.type == numbersym){
-        getToken(ifp); 
+        getToken(ifp);
     }
     else if(curr_token.type == lparentsym){
-        getToken(ifp); 
+        getToken(ifp);
         expression(ifp);
     }
     else if(curr_token.type != rparentsym){
-        getToken(ifp); 
+        getToken(ifp);
     }
     else{
-        error(23); 
+        error(23);
     }
 }// end Factor
 
 /*void emit(int op, int l, int m){
 	if(cx>CODE_SIZE){
- error(25); 
+ error(25);
 	}
 	else{
  
@@ -404,22 +398,23 @@ void factor(FILE *ifp){
 
 void printSymbolTable(){
     int i;
-	printf("Name \t Type \t Level \t Value\n");
+    printf("Name \t Type \t Level \t Value\n");
     for(i = 0; i < tokenNum; i++){
-    	char type[6] = "";
+        char type[6] = "";
         if(symbol_table[i].kind == 1){
-        	strcpy(type, "const");
-            //printf("%s \t %s \t %d\n", symbol_table[i].name, "const", symbol_table[i].val);
+            strcpy(type, "const");
+            printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].val);
         }
         else if(symbol_table[i].kind == 2){
-			strcpy(type, "var");
-			//printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "var", symbol_table[i].val);
+            strcpy(type, "var");
+            printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].addr);
         }
         else if(symbol_table[i].kind == 3){
             strcpy(type, "proc");
-        	//printf("Name %s Kind %s, Level  Value %d\n", symbol_table[i].name, "proc", symbol_table[i].val);
+            printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].addr);
         }
         //THE 0 IS A PLACE HOLDER FOR THE LEVEL, WE STILL NEED TO RETRIEVE THE CORRECT LEVEL
-        printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, 0, symbol_table[i].val);
+        
     }
+    
 }
