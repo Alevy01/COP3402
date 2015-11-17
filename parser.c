@@ -55,7 +55,7 @@ int tokenNum = 0;
 int filePosition = 0;
 
 int main(){
-    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
+    FILE *ifp = fopen("input.txt", "r");
     
     program(ifp);
     
@@ -218,48 +218,6 @@ void block(FILE *ifp){
             
         }while(curr_token.type == commasym);
         
-<<<<<<< HEAD
-    }while(curr_token.type == commasym);
-    
-    if(curr_token.type != semicolonsym){
-        error(5);
-    }
-
-}
-
-void var_dec(FILE *ifp){
-    do{
-        symbol_table[tokenNum].kind = 2;
-        getToken(ifp);
-        if(curr_token.type != identsym){
-            error(4);
-        }
-        strcpy(symbol_table[tokenNum].name,curr_token.string);
-        symbol_table[tokenNum].level = 0;
-        //symbol_table[tokenNum].addr = m;
-        //m++;
-        tokenNum++;
-        getToken(ifp);
-    }while(curr_token.type == commasym);
-    
-    if(curr_token.type != semicolonsym){
-        error(2);
-    }
-    
-    getToken(ifp);
-
-}
-
-void proc_dec(FILE *ifp){
-    while(curr_token.type == procsym){
-        symbol_table[tokenNum].kind = 3;
-        getToken(ifp);
-        if(curr_token.type != identsym){
-            error(6);
-        }
-        strcpy(symbol_table[tokenNum].name, curr_token.string);
-        tokenNum++;
-
         if(curr_token.type != semicolonsym){
             error(5);
         }
