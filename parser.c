@@ -206,7 +206,8 @@ void block(FILE *ifp){
             strcpy(symbol_table[tokenNum].name,curr_token.string);
             getToken(ifp);
             if(curr_token.type != eqsym){
-                error(3);            }
+                error(3);            
+            }
             getToken(ifp);
             if(curr_token.type != numbersym)
             {
