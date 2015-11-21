@@ -70,9 +70,9 @@ void term(FILE *ifp);
 void factor(FILE *ifp);
 void emit(int op, int l, int m);
 void printSymbolTable();
-int getAddrFromSymbol(char[] tempString);
-int getValFromSymbol(char[] tempString);
-int getSymbolType(char[] tempString);
+int getAddrFromSymbol(char tempString[]);
+int getValFromSymbol(char tempString[]);
+int getSymbolType(char tempString[]);
 
 //Global token
 typedef struct{
@@ -437,7 +437,7 @@ void term(FILE *ifp){
     }
 }// end term
 
-int getSymbolType(char[] tempString){
+int getSymbolType(char tempString[]){
     int i = 0;
     for(i = 0; i<tokenNum; i++){
         if(strcmp(symbol_table[i].name, tempString) == 0){
@@ -448,7 +448,7 @@ int getSymbolType(char[] tempString){
     return 0;
 }
 
-int getValFromSymbol(char[] tempString){
+int getValFromSymbol(char tempString[]){
     int i = 0;
     for(i = 0; i<tokenNum; i++){
         if(strcmp(symbol_table[i].name, tempString) == 0){
@@ -460,7 +460,7 @@ int getValFromSymbol(char[] tempString){
 }
 
 
-int getAddrFromSymbol(char[] tempString){
+int getAddrFromSymbol(char tempString[]){
     int i = 0;
     for(i = 0; i<tokenNum; i++){
         if(strcmp(symbol_table[i].name, tempString) == 0){
