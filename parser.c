@@ -14,6 +14,32 @@ typedef enum {
 
 #define MAX_STRING_LEN 11
 #define MAX_SYMBOL_TABLE_SIZE 100
+#define LIT 1
+#define OPR 2
+#define LOD 3
+#define STO 4
+#define CAL 5
+#define INC 6
+#define JMP 7
+#define JPC 8
+#define SIO 9
+#define OPR_RTN 0
+#define OPR_NEG 1
+#define OPR_ADD 2
+#define OPR_SUB 3
+#define OPR_MUL 4
+#define OPR_DIV 5
+#define OPR_ODD 6
+#define OPR_MOD 7
+#define OPR_EQL 8
+#define OPR_NEQ 9
+#define OPR_LSS 10
+#define OPR_LEQ 11
+#define OPR_GTR 12
+#define OPR_GEQ 13
+
+
+
 /* For constants, store kind, name and val   For variables, store kind, name, L and M   For procedures, store kind, name, L and M */
 typedef struct symbol {
     int kind;   // const = 1, var = 2, proc = 3
@@ -36,6 +62,9 @@ void expression(FILE *ifp);
 void term(FILE *ifp);
 void factor(FILE *ifp);
 void printSymbolTable();
+int getAddrFromSymbol(char[] tempString);
+int getValFromSymbol(char[] tempString);
+int getSymbolType(char[] tempString);
 //Global token
 typedef struct{
     char string[MAX_STRING_LEN];
@@ -53,13 +82,12 @@ symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
 token curr_token;
 int tokenNum = 0;
 int filePosition = 0;
+char tempString[12];
 
 int main(){
-    FILE *ifp = fopen("input.txt", "r");
+    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
     
     program(ifp);
-    
-    
     
     return 0;
 }
@@ -368,18 +396,71 @@ void term(FILE *ifp){
     }
 }// end term
 
+int getSymbolType(char[] tempString){
+    int i = 0;
+    for(i = 0; i<tokenNum; i++){
+        if(strcmp(symbol_table[i].name, tempString) == 0){
+            return symbol_table[i].kind;
+        }
+    }
+
+    return 0;
+}
+
+int getValFromSymbol(char[] tempString){
+    int i = 0;
+    for(i = 0; i<tokenNum; i++){
+        if(strcmp(symbol_table[i].name, tempString) == 0){
+            return symbol_table[i].val;
+        }
+    }
+
+    return 0;
+}
+
+
+int getAddrFromSymbol(char[] tempString){
+    int i = 0;
+    for(i = 0; i<tokenNum; i++){
+        if(strcmp(symbol_table[i].name, tempString) == 0){
+            return symbol_table[i].addr;
+        }
+    }
+
+    return 0;
+}
+
+
 void factor(FILE *ifp){
+    int temp = 0;
     if(curr_token.type == identsym){
+        m = getSymbolType(curr_token.string);
+        if(m == 0){
+            error(11);
+        }
+        if(m == 1){
+            temp = getValFromSymbol(curr_token.string);
+            emit(LIT, 0, temp);
+        }
+        if(m == 2){
+            temp = getAddrFromSymbol(curr_token.string);
+            emit(LOD, 0, temp);
+        }
+        if(m == 3){
+            error(21);
+        }
         getToken(ifp);
     }
     else if(curr_token.type == numbersym){
+        emit(LIT, 0, curr_token.numeric);
         getToken(ifp);
     }
     else if(curr_token.type == lparentsym){
         getToken(ifp);
         expression(ifp);
-    }
-    else if(curr_token.type != rparentsym){
+        if(curr_token.type != rparentsym){
+            error(22);
+        }
         getToken(ifp);
     }
     else{
@@ -414,7 +495,6 @@ void printSymbolTable(){
             strcpy(type, "proc");
             printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].addr);
         }
-        //THE 0 IS A PLACE HOLDER FOR THE LEVEL, WE STILL NEED TO RETRIEVE THE CORRECT LEVEL
         
     }
     
