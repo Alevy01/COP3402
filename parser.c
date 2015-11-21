@@ -11,9 +11,17 @@ typedef enum {
     readsym, elsesym
 } token_type;
 
+typedef enum {
+    LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SIO, OPR_RTN,
+    OPR_NEG, OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_ODD, OPR_MOD,
+    OPR_EQL, OPR_NEQ, OPR_LSS, OPR_LEQ, OPR_GTR, OPR_GEQ
+} shortcut;
+
 
 #define MAX_STRING_LEN 11
 #define MAX_SYMBOL_TABLE_SIZE 100
+#define MAX_CODE_SIZE 500
+#define MAX_LEXI 3
 /* For constants, store kind, name and val   For variables, store kind, name, L and M   For procedures, store kind, name, L and M */
 typedef struct symbol {
     int kind;   // const = 1, var = 2, proc = 3
@@ -26,6 +34,7 @@ typedef struct symbol {
 
 int LexLevel = 0;
 int m = 3;
+
 void getToken(FILE *ifp);
 void program(FILE *ifp);
 void error(int errNumber);
@@ -35,7 +44,9 @@ void condition(FILE *ifp);
 void expression(FILE *ifp);
 void term(FILE *ifp);
 void factor(FILE *ifp);
+void emit(int op, int l, int m);
 void printSymbolTable();
+
 //Global token
 typedef struct{
     char string[MAX_STRING_LEN];
@@ -47,12 +58,16 @@ typedef struct{
     int op;
     int l;
     int m;
-} code;
+} indCode;
+
+indCode code[MAX_CODE_SIZE];
+int cx = 0;
 
 symbol symbol_table[MAX_SYMBOL_TABLE_SIZE];
 token curr_token;
 int tokenNum = 0;
 int filePosition = 0;
+
 
 int main(){
     FILE *ifp = fopen("input.txt", "r");
@@ -63,6 +78,7 @@ int main(){
     
     return 0;
 }
+
 
 void program(FILE *ifp){
     while(!feof(ifp)){
@@ -77,7 +93,6 @@ void program(FILE *ifp){
     else{
         printf("no errors\n\n\n");
     }
-    
 }
 
 
@@ -104,7 +119,6 @@ void getToken(FILE *ifp){
      printf("%s ", curr_token.string);
      printf("%d \n", curr_token.numeric);
      */
-    
 }
 
 
@@ -190,10 +204,12 @@ void error(int errNumber){
             printf("Error. Not a valid code Error value.\n");
             break;
     }
-    
 }
 
+
 void block(FILE *ifp){
+    
+    emit(JMP, 0, 1);
     
     if(curr_token.type == constsym)
     {
@@ -206,7 +222,7 @@ void block(FILE *ifp){
             strcpy(symbol_table[tokenNum].name,curr_token.string);
             getToken(ifp);
             if(curr_token.type != eqsym){
-                error(3);            
+                error(3);
             }
             getToken(ifp);
             if(curr_token.type != numbersym)
@@ -274,14 +290,15 @@ void block(FILE *ifp){
             }
             getToken(ifp);
         }
+        emit(INC, 0, m);
         statement(ifp);
         
     }
     else {
+        emit(INC, 0, m);
         statement(ifp);
     }
 }
-
 
 
 void statement(FILE *ifp){
@@ -292,6 +309,7 @@ void statement(FILE *ifp){
         }
         getToken(ifp);
         expression(ifp);
+        emit(STO, 0, m);
     }
     else if(curr_token.type == callsym){
         getToken(ifp);
@@ -316,26 +334,39 @@ void statement(FILE *ifp){
     else if(curr_token.type == ifsym){
         getToken(ifp);
         condition(ifp);
+        int currentCX = cx;
+        emit(JPC, 0, -99);
+        
         if(curr_token.type != thensym){
             error(16);
         }
         getToken(ifp);
         statement(ifp);
+        code[currentCX].m = cx;
     }
     else if(curr_token.type == whilesym){
         getToken(ifp);
+        int CXbc = cx;
         condition(ifp);
+        int CXac = cx;
+        emit(JPC, 0, -99);
+        
         if(curr_token.type != dosym){
             error(18);
         }
         getToken(ifp);
         statement(ifp);
+        emit(JMP, 0, CXbc);
+        code[CXac].m = cx;
     }
 }// end statement
+
+
 void condition(FILE *ifp){
     if(curr_token.type == oddsym){
         getToken(ifp);
         expression(ifp);
+        emit(OPR, 0, OPR_ODD);
     }
     else{
         expression(ifp);
@@ -344,33 +375,48 @@ void condition(FILE *ifp){
         }
         getToken(ifp);
         expression(ifp);
+        emit(OPR, 0, curr_token.type-1);
     }
 }// end condition
+
 
 void expression(FILE *ifp){
     if(curr_token.type == plussym || curr_token.type == minussym){
         getToken(ifp);
+        if(curr_token.type == minussym)
+            emit(OPR, 0, OPR_NEG); //negation
     }
     
     term(ifp);
     while(curr_token.type == plussym || curr_token.type == minussym){
         getToken(ifp);
         term(ifp);
+        if(curr_token.type == plussym)
+            emit(OPR, 0, OPR_ADD);
+        else
+            emit(OPR, 0, OPR_SUB);
     }
-    
 }// end expression
+
 
 void term(FILE *ifp){
     factor(ifp);
     while(curr_token.type == multsym || curr_token.type == slashsym){
         getToken(ifp);
         factor(ifp);
+        if (curr_token.type == multsym)
+            emit(OPR, 0, OPR_MUL);
+        else
+            emit(OPR, 0, OPR_DIV);
     }
 }// end term
 
+
 void factor(FILE *ifp){
     if(curr_token.type == identsym){
+        
         getToken(ifp);
+        
     }
     else if(curr_token.type == numbersym){
         getToken(ifp);
@@ -387,15 +433,17 @@ void factor(FILE *ifp){
     }
 }// end Factor
 
-/*void emit(int op, int l, int m){
-	if(cx>CODE_SIZE){
- error(25);
-	}
-	else{
- 
-	}
-	
- }*/
+
+void emit(int op, int l, int m) {
+    if (cx > MAX_CODE_SIZE) {
+        error(25);
+    } else {
+        code[cx].op = op; // opcode
+        code[cx].l = l; // lexicographical level
+        code[cx].m = m; // modifier
+        cx++;
+    }
+}
 
 void printSymbolTable(){
     int i;
@@ -415,7 +463,5 @@ void printSymbolTable(){
             printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].addr);
         }
         //THE 0 IS A PLACE HOLDER FOR THE LEVEL, WE STILL NEED TO RETRIEVE THE CORRECT LEVEL
-        
     }
-    
 }
