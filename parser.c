@@ -70,9 +70,16 @@ void term(FILE *ifp);
 void factor(FILE *ifp);
 void emit(int op, int l, int m);
 void printSymbolTable();
+<<<<<<< HEAD
+void printCode();
+int getAddrFromSymbol(char[] tempString);
+int getValFromSymbol(char[] tempString);
+int getSymbolType(char[] tempString);
+=======
 int getAddrFromSymbol(char tempString[]);
 int getValFromSymbol(char tempString[]);
 int getSymbolType(char tempString[]);
+>>>>>>> origin/master
 
 //Global token
 typedef struct{
@@ -119,6 +126,7 @@ void program(FILE *ifp){
     else{
         printf("no errors\n\n\n");
     }
+    printCode();
 }
 
 
@@ -542,4 +550,13 @@ void printSymbolTable(){
         }
 
     }
+}
+
+void printCode() {
+    FILE *mcode = fopen("mcode.txt", "w");
+    int q;
+    for (q = 0; q < cx; q++) {
+        fprintf(mcode, "%d %d %d\n", code[q].op, code[q].l, code[q].m);
+    }
+    fclose(mcode);
 }
