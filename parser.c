@@ -70,16 +70,10 @@ void term(FILE *ifp);
 void factor(FILE *ifp);
 void emit(int op, int l, int m);
 void printSymbolTable();
-<<<<<<< HEAD
 void printCode();
-int getAddrFromSymbol(char[] tempString);
-int getValFromSymbol(char[] tempString);
-int getSymbolType(char[] tempString);
-=======
 int getAddrFromSymbol(char tempString[]);
 int getValFromSymbol(char tempString[]);
 int getSymbolType(char tempString[]);
->>>>>>> origin/master
 
 //Global token
 typedef struct{
