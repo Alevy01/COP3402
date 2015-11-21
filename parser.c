@@ -46,6 +46,7 @@ void term(FILE *ifp);
 void factor(FILE *ifp);
 void emit(int op, int l, int m);
 void printSymbolTable();
+void printCode();
 
 //Global token
 typedef struct{
@@ -93,6 +94,7 @@ void program(FILE *ifp){
     else{
         printf("no errors\n\n\n");
     }
+    printCode();
 }
 
 
@@ -464,4 +466,13 @@ void printSymbolTable(){
         }
         //THE 0 IS A PLACE HOLDER FOR THE LEVEL, WE STILL NEED TO RETRIEVE THE CORRECT LEVEL
     }
+}
+
+void printCode() {
+    FILE *mcode = fopen("mcode.txt", "w");
+    int q;
+    for (q = 0; q < cx; q++) {
+        fprintf(mcode, "%d %d %d\n", code[q].op, code[q].l, code[q].m);
+    }
+    fclose(mcode);
 }
