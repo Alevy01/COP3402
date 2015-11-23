@@ -76,8 +76,15 @@ int main(void) {
     
     printSymbolTable();
 
-    if (currToken != periodsym)
-        error(9);
+    if (currToken != periodsym){
+        if(currToken != nulsym){
+            error(8);
+        }
+        else{
+            error(9);
+        }
+    }
+        
     
     emit(11, 0, 3);
     
@@ -184,10 +191,11 @@ void block() {
         emit(OPR, 0, OPR_RTN);
         
         if(currToken != semicolonsym)
-            error(5);
+            error(6);
         
         getToken();
     }
+
     codeList[jmpCX].m = cx;
     
     emit(INC, 0, mCount);
@@ -247,6 +255,9 @@ void statement() {
             printf("\ntoken: %d\n", currToken);
             error(17);
         }
+        else if(currToken == beginsym || currToken == identsym){
+            error(10);
+        }
         
         getToken();
     }
@@ -299,6 +310,14 @@ void statement() {
         emit(JPC, 0, aCX);
         codeList[bCX].m = cx;
     }
+    else{
+        if(currToken == periodsym){
+            error(17);
+        }
+        else{
+            error(7);
+        }
+    }
 }
 
 
@@ -327,6 +346,11 @@ void condition() {
 void expression() {
     int addOP;
     
+    if(currToken != numbersym && currToken != identsym && currToken != lparentsym
+        && currToken != minussym && currToken != plussym){
+        error(24);
+    }
+
     if (currToken == plussym || currToken == minussym) {
         addOP = currToken;
         
@@ -453,21 +477,21 @@ void error(int errNumber){
         case 5:
             printf("Semicolon or comma missing.\n");
             break;
-            // case 6:
-            //     printf("Incorrect symbol after procedure declaration.\n");
-            //     break;
-            // case 7:
-            //     printf("Statement Expected.\n");
-            //     break;
-            // case 8:
-            //     printf("Incorrect symbol after statement part in block.\n");
-            //     break;
+        case 6:
+            printf("Incorrect symbol after procedure declaration.\n");
+            break;
+        case 7:
+            printf("Statement Expected.\n");
+            break;
+        case 8:
+            printf("Incorrect symbol after statement part in block.\n");
+            break;
         case 9:
             printf("Period expected.\n");
             break;
-            // case 10:
-            //     printf("Semicolon between statements missing.\n");
-            //     break;
+        case 10:
+            printf("Semicolon between statements missing.\n");
+            break;
         case 11:
             printf("Undeclared Identifier\n");
             break;
@@ -480,9 +504,9 @@ void error(int errNumber){
         case 14:
             printf("Call must be followed by an identifier.\n");
             break;
-            // case 15:
-            //     printf("Call of a constant or variable is meaningless.\n");
-            //     break;
+        // case 15:
+        //     printf("Call of a constant or variable is meaningless.\n");
+        //     break;
         case 16:
             printf("then expcted.\n");
             break;
@@ -507,9 +531,9 @@ void error(int errNumber){
         case 23:
             printf("The preceding factor cannot begin with this symbol.\n");
             break;
-            // case 24:
-            //     printf("An expression canot begin with this symbol.\n");
-            //     break;
+        case 24:
+            printf("An expression canot begin with this symbol.\n");
+            break;
         case 25:
             printf("This number is too large.\n");
             break;
