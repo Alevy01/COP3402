@@ -19,7 +19,7 @@ typedef enum {
 } opCodes;
 
 typedef enum {
-    OPR_RTN = 1, OPR_NEG, OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, 
+    OPR_RTN = 0, OPR_NEG, OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, 
     OPR_ODD, OPR_MOD, OPR_EQL, OPR_NEQ, OPR_LSS, OPR_LEQ, 
     OPR_GTR, OPR_GEQ
 } oprCodes;
@@ -219,7 +219,7 @@ void statement() {
         
         getToken();
         expression();
-        emit(STO, curLexLevel, tempM);
+        emit(STO, curLexLevel - symbolTable[result].level, tempM);
     }
     
     //Callsym
@@ -230,7 +230,7 @@ void statement() {
         
         fscanf(input, "%s", temp);
         result = isInSymTable(temp);
-        emit(CAL, curLexLevel - symbolTable[result].value, symbolTable[result].addr);
+        emit(CAL, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
         getToken();
     }
     
@@ -269,14 +269,14 @@ void statement() {
         if (currToken == elsesym) {
             int elseCX = cx;
             emit(JMP, 0, -99);
-            codeList[currCX].m = cx + 1;
+            codeList[currCX].m = cx;
             getToken();
             statement();
-            codeList[elseCX].m = cx + 1;
+            codeList[elseCX].m = cx;
         }
         
         else {
-            codeList[currCX].m = cx + 1;
+            codeList[currCX].m = cx;
         }
     }
     
@@ -387,7 +387,7 @@ void factor() {
         }
         
         else if (symbolTable[result].kind == 2) {
-            emit(LOD, curLexLevel, symbolTable[result].addr);
+            emit(LOD, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
         }
         
         else if (symbolTable[result].kind == 0) {
