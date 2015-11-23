@@ -99,7 +99,7 @@ char tempString[12];
 
 
 int main(){
-    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
+    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
     
     program(ifp);
     
@@ -272,7 +272,7 @@ void block(FILE *ifp){
         if(curr_token.type != semicolonsym){
             error(5);
         }
-
+        
     }
     
     else if(curr_token.type == varsym){
@@ -347,6 +347,9 @@ void block(FILE *ifp){
 
 
 void statement(FILE *ifp){
+    if(symbol_table[tokenNum].level != LexLevel){
+        error(11);
+    }
     if(curr_token.type == identsym){
         getToken(ifp);
         if(curr_token.type != becomessym){
