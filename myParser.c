@@ -168,6 +168,7 @@ void block() {
         symbolTable[sTableCount].level = curLexLevel;
         symbolTable[sTableCount].addr = cx;
         mCount++;
+        sTableCount++;
         
         getToken();
         if (currToken != semicolonsym)
