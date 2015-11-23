@@ -460,7 +460,7 @@ int isInSymTable(char temp[12] ) {
 
 void error(int errNumber){
     
-    printf("Error Code %d: ", errNumber);
+    printf("\nError Code %d on line %d: ", errNumber, cx);
     switch(errNumber){
         case 1:
             printf("Use = instead of :=\n");
