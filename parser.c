@@ -117,9 +117,7 @@ void program(FILE *ifp){
     if(curr_token.type != periodsym){
         error(9);
     }
-    else{
-        printf("no errors\n\n\n");
-    }
+
     printCode();
 }
 
@@ -142,11 +140,11 @@ void getToken(FILE *ifp){
     }
     
     filePosition++;
-    /*
-     printf("%d ", curr_token.type);
-     printf("%s ", curr_token.string);
-     printf("%d \n", curr_token.numeric);
-     */
+    
+     // printf("%d ", curr_token.type);
+     // printf("%s ", curr_token.string);
+     // printf("%d \n", curr_token.numeric);
+     
 }
 
 
@@ -285,7 +283,8 @@ void block(FILE *ifp){
             symbol_table[tokenNum].kind = 2;
             getToken(ifp);
             if(curr_token.type != identsym){
-                error(4);}
+                error(4);
+            }
             strcpy(symbol_table[tokenNum].name,curr_token.string);
             symbol_table[tokenNum].level = LexLevel;
             symbol_table[tokenNum].addr = m;
@@ -496,6 +495,7 @@ int getAddrFromSymbol(char tempString[]){
 void factor(FILE *ifp){
     int temp = 0;
     if(curr_token.type == identsym){
+        printf("%s\n", curr_token.string);
         m = getSymbolType(curr_token.string);
         if(m == 0){
             error(11);
