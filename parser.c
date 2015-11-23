@@ -99,7 +99,7 @@ char tempString[12];
 
 
 int main(){
-    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
+    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
     
     program(ifp);
     
@@ -278,6 +278,9 @@ void block(FILE *ifp){
     }
     
     else if(curr_token.type == varsym){
+        if(symbol_table[tokenNum-1].kind != 2){
+            m = 4;
+        }
         do{
             symbol_table[tokenNum].kind = 2;
             getToken(ifp);
@@ -299,6 +302,9 @@ void block(FILE *ifp){
         
     }
     else if(curr_token.type == procsym){
+        if(symbol_table[tokenNum-1].kind != 3){
+            m = 1;
+        }
         while(curr_token.type == procsym){
             symbol_table[tokenNum].kind = 3;
             getToken(ifp);
