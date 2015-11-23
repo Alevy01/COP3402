@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAX_SYMBOL_TABLE_SIZE 100
 #define MAX_CODE_SIZE 500
@@ -45,7 +46,6 @@ code codeList[MAX_CODE_SIZE];
 FILE *input;
 int currToken = 0;
 int sTableCount = 0;
-int mCount = 4;
 int curLexLevel = 0;
 int cx = 0;
 
@@ -75,11 +75,11 @@ int main(void) {
     block();
     
     printSymbolTable();
-    
+
     if (currToken != periodsym)
         error(9);
     
-    emit(SIO, 0, 2);
+    emit(11, 0, 3);
     
     printCode();
     
@@ -171,7 +171,6 @@ void block() {
         fscanf(input, "%s", symbolTable[sTableCount].name);
         symbolTable[sTableCount].level = curLexLevel;
         symbolTable[sTableCount].addr = cx;
-        mCount++;
         sTableCount++;
         
         getToken();
@@ -276,6 +275,7 @@ void statement() {
         }
         
         else {
+            emit(JMP, 0, cx + 1);
             codeList[currCX].m = cx;
         }
     }
@@ -436,6 +436,7 @@ int isInSymTable(char temp[12] ) {
 
 void error(int errNumber){
     
+    printf("Error Code %d: ", errNumber);
     switch(errNumber){
         case 1:
             printf("Use = instead of :=\n");
@@ -516,6 +517,7 @@ void error(int errNumber){
             printf("Error. Not a valid code Error value.\n");
             break;
     }
+    exit(errNumber);
 }
 
 
