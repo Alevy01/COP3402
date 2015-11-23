@@ -15,10 +15,14 @@ typedef enum {
 } token_type;
 
 typedef enum {
-    LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SIO, OPR_RTN,
-    OPR_NEG, OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_ODD, OPR_MOD,
-    OPR_EQL, OPR_NEQ, OPR_LSS, OPR_LEQ, OPR_GTR, OPR_GEQ
+    LIT = 1, OPR, LOD, STO, CAL, INC, JMP, JPC, SIO
 } opCodes;
+
+typedef enum {
+    OPR_RTN = 1, OPR_NEG, OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, 
+    OPR_ODD, OPR_MOD, OPR_EQL, OPR_NEQ, OPR_LSS, OPR_LEQ, 
+    OPR_GTR, OPR_GEQ
+} oprCodes;
 
 typedef struct symbol {
     int kind;       // Const = 1, Var = 2, Proc = 3;
@@ -215,7 +219,7 @@ void statement() {
         
         getToken();
         expression();
-        emit(STO, curLexLevel - symbolTable[result].value, tempM);
+        emit(STO, curLexLevel, tempM);
     }
     
     //Callsym
@@ -265,14 +269,14 @@ void statement() {
         if (currToken == elsesym) {
             int elseCX = cx;
             emit(JMP, 0, -99);
-            codeList[currCX].m = cx;
+            codeList[currCX].m = cx + 1;
             getToken();
             statement();
-            codeList[elseCX].m = cx;
+            codeList[elseCX].m = cx + 1;
         }
         
         else {
-            codeList[currCX].m = cx;
+            codeList[currCX].m = cx + 1;
         }
     }
     
@@ -383,7 +387,7 @@ void factor() {
         }
         
         else if (symbolTable[result].kind == 2) {
-            emit(LOD, 0, symbolTable[result].addr);
+            emit(LOD, curLexLevel, symbolTable[result].addr);
         }
         
         else if (symbolTable[result].kind == 0) {
