@@ -472,7 +472,7 @@ void error(int errNumber){
             printf("Undeclared Identifier\n");
             break;
         case 12:
-            printf("Assignment to constatn or procedure is not allowed.\n");
+            printf("Assignment to constant or procedure is not allowed.\n");
             break;
         case 13:
             printf("Assignment operator expected\n");
