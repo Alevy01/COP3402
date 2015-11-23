@@ -57,7 +57,7 @@ typedef struct symbol {
 
 
 int LexLevel = 0;
-int m = 3;
+int m = 4;
 
 void getToken(FILE *ifp);
 void program(FILE *ifp);
@@ -99,7 +99,7 @@ char tempString[12];
 
 
 int main(){
-    FILE *ifp = fopen("/Users/AdamLevy/Downloads/tokenlist.txt", "r");
+    FILE *ifp = fopen("/Users/sagarmistry/Desktop/input.txt", "r");
     
     program(ifp);
     
@@ -234,10 +234,18 @@ void error(int errNumber){
     }
 }
 
+int first = 1;
 
 void block(FILE *ifp){
     
     emit(JMP, 0, 1);
+    if(first == 1){
+        LexLevel = 0;
+        first = 0;
+    }
+    else{
+        LexLevel++;
+    }
     
     if(curr_token.type == constsym)
     {
@@ -266,7 +274,7 @@ void block(FILE *ifp){
         if(curr_token.type != semicolonsym){
             error(5);
         }
-        m = 3;
+
     }
     
     else if(curr_token.type == varsym){
@@ -298,6 +306,9 @@ void block(FILE *ifp){
                 error(6);
             }
             strcpy(symbol_table[tokenNum].name, curr_token.string);
+            symbol_table[tokenNum].level = LexLevel;
+            symbol_table[tokenNum].addr = m;
+            m++;
             tokenNum++;
             getToken(ifp);
             if(curr_token.type != semicolonsym){
@@ -326,6 +337,7 @@ void block(FILE *ifp){
         emit(INC, 0, m);
         statement(ifp);
     }
+    LexLevel--;
 }
 
 
@@ -446,7 +458,7 @@ int getSymbolType(char tempString[]){
             return symbol_table[i].kind;
         }
     }
-
+    
     return 0;
 }
 
@@ -457,7 +469,7 @@ int getValFromSymbol(char tempString[]){
             return symbol_table[i].val;
         }
     }
-
+    
     return 0;
 }
 
@@ -469,7 +481,7 @@ int getAddrFromSymbol(char tempString[]){
             return symbol_table[i].addr;
         }
     }
-
+    
     return 0;
 }
 
@@ -493,7 +505,7 @@ void factor(FILE *ifp){
         if(m == 3){
             error(21);
         }
-
+        
         getToken(ifp);
     }
     else if(curr_token.type == numbersym){
@@ -542,7 +554,7 @@ void printSymbolTable(){
             strcpy(type, "proc");
             printf("%s \t %s \t %d \t %d\n", symbol_table[i].name, type, symbol_table[i].level, symbol_table[i].addr);
         }
-
+        
     }
 }
 
