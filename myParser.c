@@ -97,10 +97,11 @@ int main(void) {
 
 void getToken() {
     fscanf(input, "%d ", &currToken);
-    return;
 
     if (currToken == semicolonsym)
     	curLine++;
+
+    return;
 }
 
 
