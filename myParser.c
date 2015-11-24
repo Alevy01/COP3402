@@ -47,6 +47,7 @@ FILE *input;
 int currToken = 0;
 int sTableCount = 0;
 int curLexLevel = 0;
+int currLine = 1;
 int cx = 0;
 
 
@@ -89,6 +90,10 @@ int main(void) {
 
 void getToken() {
     fscanf(input, "%d ", &currToken);
+    
+    if (currToken == semicolonsym)
+        currLine++;
+
     return;
 }
 
@@ -436,7 +441,7 @@ int isInSymTable(char temp[12] ) {
 
 void error(int errNumber){
     
-    printf("\nError Code %d on line %d: ", errNumber, cx);
+    printf("\nError Code %d on line %d: ", errNumber, currLine);
     switch(errNumber){
         case 1:
             printf("Use = instead of :=\n");
