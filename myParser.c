@@ -315,6 +315,49 @@ void statement() {
         emit(JPC, 0, aCX);
         codeList[bCX].m = cx;
     }
+    
+
+    //Writesym
+    else if (currToken == writesym) {
+    	getToken();
+    	if (currToken != identsym)
+    		error(4);
+
+    	fscanf(input, "%s", temp);
+    	result = isInSymTable(temp);
+
+    	if (symbolTable[result].kind == 1)
+    		emit(LIT, 0, symbolTable[result].value);
+    	
+    	else if (symbolTable[result].kind == 2)
+    		emit(LOD, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
+
+    	else
+    		error(11);
+
+    	emit(SIO, 0, 0);
+    	getToken();
+    }
+
+    //Readsym
+    else if (currToken == readsym) {
+    	getToken();
+    	if (currToken != identsym)
+    		error(4);
+
+    	fscanf(input, "%s", temp);
+    	result = isInSymTable(temp);
+
+    	if (symbolTable[result].kind != 2)
+    		error(11);
+
+    	emit(SIO, 0, 1);
+    	emit(STO, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
+
+    	getToken();
+    }
+
+
     else{
         if(currToken == periodsym){
             error(17);
@@ -323,46 +366,6 @@ void statement() {
             error(7);
         }
     }
-
-    // //Writesym
-    // else if (currToken == writesym) {
-    // 	getToken();
-    // 	if (currToken != identsym)
-    // 		error(4);
-
-    // 	fscanf(input, "%s", temp);
-    // 	result = isInSymTable(temp);
-
-    // 	if (symbolTable[result].kind == 1)
-    // 		emit(LIT, 0, symbolTable[result].value);
-    	
-    // 	else if (symbolTable[result].kind == 2)
-    // 		emit(LOD, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
-
-    // 	else
-    // 		error(11);
-
-    // 	emit(SIO, 0, 0);
-    // 	getToken();
-    // }
-
-    // //Readsym
-    // else if (currToken == readsym) {
-    // 	getToken();
-    // 	if (currToken != identsym)
-    // 		error(4);
-
-    // 	fscanf(input, "%s", temp);
-    // 	result = isInSymTable(temp);
-
-    // 	if (symbolTable[result].kind != 2)
-    // 		error(11);
-
-    // 	emit(SIO, 0, 1);
-    // 	emit(STO, curLexLevel - symbolTable[result].level, symbolTable[result].addr);
-
-    // 	getToken();
-    // }
 }
 
 
