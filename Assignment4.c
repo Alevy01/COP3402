@@ -103,7 +103,7 @@ int main (int argc, char *argv[]) {
     if(argc>7){
         printf("too many arguments");
     }
-    else if(argc != 1 && argc<=6){
+    else if(argc != 1 && argc<=7){
         for(cmdCounter = 2; cmdCounter<argc;cmdCounter++){
             if(strcmp(argv[cmdCounter],"-t") == 0)
             {
